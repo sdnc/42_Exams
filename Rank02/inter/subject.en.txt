@@ -1,4 +1,4 @@
-Assignment name  : inter
+./inter "nothing" "This sentence hides nothing" | cat -eAssignment name  : inter
 Expected files   : inter.c
 Allowed functions: write
 --------------------------------------------------------------------------------
