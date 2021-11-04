@@ -5,7 +5,7 @@ void	putchar(char c)
 	write(1, &c, 1);
 }
 
-int	find_dup(char *s, char c, size_t idx)
+int	find_dup(char *s, size_t idx)
 {
 	size_t	i = 0;
 
@@ -28,7 +28,7 @@ int	main(int ac, char **av)
 	{
 		while (av[1][i])
 		{
-			if (!find_dup(av[1], av[1][i], i))
+			if (!find_dup(av[1], i))
 			{
 				j = 0;
 				while (av[2][j])
