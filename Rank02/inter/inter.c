@@ -7,13 +7,13 @@ void	putchar(char c)
 
 int	find_dup(char *s, size_t idx)
 {
-	size_t	i = 0;
+	size_t	iter = 0;
 
-	while (i < idx)
+	while (iter < idx)
 	{
-		if (s[i] == s[idx])
+		if (s[iter] == s[idx])
 			return (1);
-		i++;
+		iter++;
 	}
 	return (0);
 }
