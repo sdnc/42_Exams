@@ -8,11 +8,9 @@ typedef struct	{
 	int	count;
 }			t_hold;
 
-void	ft_putchar_fd(char c, int fd)
+void	ft_putchar(char c)
 {
-	if (fd < 0)
-		return ;
-	write(fd, &c, 1);
+	write(1, &c, 1);
 }
 
 
@@ -24,7 +22,7 @@ void	ft_putstr(t_hold *arguments)
 	str = va_arg(arguments->arg, char *);
 	i = 0;
 	while (str[i])
-		ft_putchar_fd(str[i++], 1);
+		ft_putchar(str[i++]);
 }
 
 void	ft_itoa(int nb, int len)
@@ -52,7 +50,7 @@ void	ft_itoa(int nb, int len)
 		n /= 10;
 	}
 	while (str[i])
-		ft_putchar_fd(str[i++], 1);
+		ft_putchar(str[i++]);
 }
 
 void	ft_putnbr(t_hold *arguments)
@@ -77,9 +75,46 @@ void	ft_putnbr(t_hold *arguments)
 	arguments->count += len;	
 }
 
+char	*malloc_address_len(unsigned long nbr, int *i)
+{
+	char	*ptr;
+
+	while (nbr >= 16)
+	{
+		nbr /= 16;
+		*i += 1;
+	}
+	ptr = (char *)malloc(sizeof(char) * (*i + 1));
+	if (!ptr)
+		return (NULL);
+	ptr[*i] = '\0';
+	return (ptr);
+}
+
 void	ft_puthex(t_hold *arguments)
 {
-	int	i = 0;
+	unsigned int	address_nbr;
+	int		i;
+	char		*str;
+
+	address_nbr = va_arg(arguments->arg, unsigned long);
+	i = 1;
+	str = malloc_address_len(address_nbr, &i);
+	i--;
+	while (i >= 0)
+	{
+		if (address_nbr % 16 < 10)
+			str[i] = (address_nbr % 16) + '0';
+		else
+			str[i] = 'a' - 10 + (address_nbr % 16);
+		address_nbr /= 16;
+		i--;
+		arguments->count++;
+	}
+	i = 0;
+	while (str[i])
+		ft_putchar(str[i++]);
+	free(str);
 }
 
 void	convert_type(char c, t_hold *arguments)
@@ -92,7 +127,7 @@ void	convert_type(char c, t_hold *arguments)
 		ft_puthex(arguments);
 	else if (c == '%')
 	{
-		ft_putchar_fd('%', 1);
+		ft_putchar('%');
 		arguments->count++;
 	}
 }
@@ -123,7 +158,7 @@ int	ft_printf(char	*str, ...)
 	{
 		if (str[i] != '%')
 		{
-			ft_putchar_fd(str[i], 1);
+			ft_putchar(str[i]);
 			count++;
 		}
 		else if (str[i] == '%')
@@ -140,5 +175,6 @@ int	main(void)
 {	
 	char	*name = "Sara";
 	int	year = 2022;
-	ft_printf("Hey there %s, it's almost %d", name, year);
+	
+	ft_printf("Hey there %s, it's almost %d. %%%% Party at cell:  %x", name, year, &year);
 }
