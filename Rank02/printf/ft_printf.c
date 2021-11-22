@@ -1,180 +1,185 @@
-#include <stdarg.h>
 #include <unistd.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct	{
-	va_list	arg;
-	int	count;
-}			t_hold;
+typedef struct  {
+    va_list args;
+    int     counter;
+}                   t_hold;
 
-void	ft_putchar(char c)
+void    ft_putchar(char c) 
 {
-	write(1, &c, 1);
+    write(1, &c, 1);
 }
 
-
-void	ft_putstr(t_hold *arguments)
+void    put_string(t_hold *arguments)
 {
-	char *str;
-	int	i;
+    char    *s;
 
-	str = va_arg(arguments->arg, char *);
-	i = 0;
-	while (str[i])
-		ft_putchar(str[i++]);
+    s = va_arg(arguments->args, char *);
+    while (*s)
+    {
+        write(1, s++, 1);
+		arguments->counter++;
+		//printf("	count += %d\n", 1);
+    }    
 }
 
-void	ft_itoa(int nb, int len)
+void    ft_itoa(int nb, int len)
 {
-	int	n;
-	int	i = 0;
-	char	*str;
+    int i = 0;
+    char    *str;
 
-	str = (char *)malloc(sizeof(char) * len + 1);
-	if (!str)
-		return ;
-	if (nb < 0)
-	{
-		str[0] = '-';
-		n = -nb;
-	}
-	else
-		n = nb;
-	if (nb == 0)
-		str[0] = '0';
-	str[len--] = '\0';
-	while (n)
-	{
-		str[len--] = n % 10 + '0';
-		n /= 10;
-	}
-	while (str[i])
-		ft_putchar(str[i++]);
+    str = (char *)malloc(sizeof(char) * len + 1);
+    if (!str)
+        return ;
+    if (nb < 0)
+    {
+        str[0] = '-';
+        nb = -nb;
+    }
+    if (nb == 0)
+        str[0] = '0';
+    str[len--] = '\0';
+    while (nb) // or (len >= 0)
+    {
+        str[len--] = nb % 10 + '0';
+        nb /= 10;
+    }
+    while (str[i])
+        ft_putchar(str[i++]);
+    free(str);
 }
 
-void	ft_putnbr(t_hold *arguments)
+void    long_to_hex(unsigned int nb, int len)
 {
-	int	len = 1;
-	int	nb_to_convert;
-	int	temp;
-	
-	nb_to_convert = va_arg(arguments->arg, int);
-	temp = nb_to_convert;
-	if (temp < 0)
-	{
-		temp = -temp;
-		len++;
-	}
-	while (temp > 9)
-	{
-		temp /= 10;
-		len++;
-	}
-	ft_itoa(nb_to_convert, len);
-	arguments->count += len;	
+    char    *str;
+    int     i = 0;
+
+    str = (char *)malloc(sizeof(char) * len + 1);
+    if (!str)
+        return ;
+    str[len--] = '\0';
+    while (nb) // or (len >= 0)
+    {
+        if (nb % 16 < 10)
+        {
+            str[len] = nb % 16 + '0';
+        }
+        else
+        {
+            str[len] = 'a' - 10 + (nb % 16);
+        }
+        len--;
+        nb /= 16;
+    }
+    while (str[i])
+        ft_putchar(str[i++]);
+    free(str);
 }
 
-char	*malloc_address_len(unsigned long nbr, int *i)
+void    put_int(t_hold *arguments)
 {
-	char	*ptr;
+    int nb;
+    int len = 1;
+    int temp;
 
-	while (nbr >= 16)
-	{
-		nbr /= 16;
-		*i += 1;
-	}
-	ptr = (char *)malloc(sizeof(char) * (*i + 1));
-	if (!ptr)
-		return (NULL);
-	ptr[*i] = '\0';
-	return (ptr);
+    nb = va_arg(arguments->args, int);
+    temp = nb;
+    if (temp < 0)
+    {
+        len++;
+        temp = -nb;
+    }
+    while (temp > 9)
+    {
+        len++;
+        temp /= 10;
+    }
+    ft_itoa(nb, len);
+	//printf("	count += %d\n", len);
+    arguments->counter += len;
 }
 
-void	ft_puthex(t_hold *arguments)
+void    put_hex(t_hold *arguments)
 {
-	unsigned int	address_nbr;
-	int		i;
-	char		*str;
+    unsigned int    address_nb;
+    int             len = 1;
+    unsigned int    temp;
 
-	address_nbr = va_arg(arguments->arg, unsigned long);
-	i = 1;
-	str = malloc_address_len(address_nbr, &i);
-	i--;
-	while (i >= 0)
-	{
-		if (address_nbr % 16 < 10)
-			str[i] = (address_nbr % 16) + '0';
-		else
-			str[i] = 'a' - 10 + (address_nbr % 16);
-		address_nbr /= 16;
-		i--;
-		arguments->count++;
-	}
-	i = 0;
-	while (str[i])
-		ft_putchar(str[i++]);
-	free(str);
+    address_nb = va_arg(arguments->args, unsigned long);
+    temp = address_nb;
+    while (temp > 16)
+    {
+        len++;
+        temp /= 16;
+    }
+    long_to_hex(address_nb, len);
+	//printf("	count += %d\n", len);
+    arguments->counter += len;
 }
 
-void	convert_type(char c, t_hold *arguments)
+void    convert_type(char c, t_hold *arguments)
 {
-	if (c == 's')
-		ft_putstr(arguments);
-	else if (c == 'd')
-		ft_putnbr(arguments);
-	else if (c == 'x')
-		ft_puthex(arguments);
-	else if (c == '%')
-	{
-		ft_putchar('%');
-		arguments->count++;
-	}
+    if (c == 's')
+        put_string(arguments);
+    else if (c == 'd')
+        put_int(arguments);
+    else if (c == 'x')
+        put_hex(arguments);
+    else if (c == '%')
+    {
+        ft_putchar('%');
+        arguments->counter += 1;
+		//printf("	count += %d\n", 1);
+    }
 }
 
-
-static t_hold	*init_args(void)
+static t_hold   *init_args()
 {
-	t_hold	*arguments;
+    t_hold *arguments;
 
-	arguments = (t_hold *)malloc(sizeof(t_hold));
-	if (!arguments)
-		return (0);
-	arguments->count = 0;
-	return (arguments);
+    arguments = (t_hold *)malloc(sizeof(t_hold));
+    if (!arguments)
+        return (NULL);
+    arguments->counter = 0;
+    return (arguments);
 }
 
-int	ft_printf(char	*str, ...)
+int ft_printf(char *str, ...)
 {
-	t_hold	*arguments;
-	int	count;
-	int	i;
+    t_hold  *arguments;
+    int     i = 0;
+    int     count = 0;
 
-	i = 0;
-	count = 0;
-	arguments = init_args();
-	va_start(arguments->arg, str);
-	while (str[i])
-	{
-		if (str[i] != '%')
-		{
-			ft_putchar(str[i]);
-			count++;
-		}
-		else if (str[i] == '%')
-			convert_type(str[++i], arguments);
-		i++;	
-	}
-	count += arguments->count;
-	va_end(arguments->arg);
-	free(arguments);
-	return (count);
+    arguments = init_args();
+    va_start(arguments->args, str);
+    while (str[i])
+    {
+        if (str[i] != '%')
+        {
+            ft_putchar(str[i]);
+            count++;
+			//printf("	count += %d\n", 1);
+        }
+        else 
+            convert_type(str[++i], arguments);
+        i++;
+    }
+    count += arguments->counter;
+    va_end(arguments->args);
+    free(arguments);
+	//printf("\nA total count of: %d characters\n", count);
+    return (count);
 }
 
-int	main(void)
-{	
-	char	*name = "Sara";
-	int	year = 2022;
-	
-	ft_printf("Hey there %s, it's almost %d. %%%% Party at cell:  %x", name, year, &year);
+int main(void)
+{
+    char    *name = "Sara";
+    int     year = 2021;
+    int     *place = &year;
+
+    ft_printf("Hello there %s. 90%% of %d is over. Meet me at %x", name, year, place);
+    return (0);
 }
