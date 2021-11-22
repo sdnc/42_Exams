@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 typedef struct  {
     va_list args;
