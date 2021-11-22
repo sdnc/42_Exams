@@ -28,8 +28,8 @@ void    put_string(t_hold *arguments)
 
 void    ft_itoa(int nb, int len)
 {
-    int i = 0;
     char    *str;
+	int 	i = 0;
 
     str = (char *)malloc(sizeof(char) * len + 1);
     if (!str)
@@ -42,7 +42,7 @@ void    ft_itoa(int nb, int len)
     if (nb == 0)
         str[0] = '0';
     str[len--] = '\0';
-    while (nb) // or (len >= 0)
+    while (len >= 0) // or (len >= 0)
     {
         str[len--] = nb % 10 + '0';
         nb /= 10;
@@ -61,7 +61,7 @@ void    long_to_hex(unsigned int nb, int len)
     if (!str)
         return ;
     str[len--] = '\0';
-    while (nb) // or (len >= 0)
+    while (len >= 0) // or (len >= 0)
     {
         if (nb % 16 < 10)
         {
@@ -97,7 +97,7 @@ void    put_int(t_hold *arguments)
         len++;
         temp /= 10;
     }
-    ft_itoa(nb, len);
+    ft_itoa(nb, len + 1);
 	//printf("	count += %d\n", len);
     arguments->counter += len;
 }
@@ -115,7 +115,7 @@ void    put_hex(t_hold *arguments)
         len++;
         temp /= 16;
     }
-    long_to_hex(address_nb, len);
+    long_to_hex(address_nb, len + 1);
 	//printf("	count += %d\n", len);
     arguments->counter += len;
 }
