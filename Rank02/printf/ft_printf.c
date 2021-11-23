@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 
 typedef struct  {
     va_list args;
@@ -42,7 +42,7 @@ void    ft_itoa(int nb, int len)
     if (nb == 0)
         str[0] = '0';
     str[len--] = '\0';
-    while (len >= 0) // or (len >= 0)
+    while (nb)
     {
         str[len--] = nb % 10 + '0';
         nb /= 10;
@@ -61,7 +61,7 @@ void    long_to_hex(unsigned int nb, int len)
     if (!str)
         return ;
     str[len--] = '\0';
-    while (len >= 0) // or (len >= 0)
+    while (len >= 0)
     {
         if (nb % 16 < 10)
         {
@@ -97,7 +97,7 @@ void    put_int(t_hold *arguments)
         len++;
         temp /= 10;
     }
-    ft_itoa(nb, len + 1);
+    ft_itoa(nb, len);
 	//printf("	count += %d\n", len);
     arguments->counter += len;
 }
@@ -115,8 +115,8 @@ void    put_hex(t_hold *arguments)
         len++;
         temp /= 16;
     }
-    long_to_hex(address_nb, len + 1);
-	//printf("	count += %d\n", len);
+    long_to_hex(address_nb, len);
+	printf("	count += %d\n", len);
     arguments->counter += len;
 }
 
@@ -177,7 +177,7 @@ int ft_printf(char *str, ...)
 int main(void)
 {
     char    *name = "Sara";
-    int     year = 2021;
+    int     year = -2021;
     int     *place = &year;
 
     ft_printf("Hello there %s. 90%% of %d is over. Meet me at %x", name, year, place);
